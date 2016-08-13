@@ -33,7 +33,8 @@ With Managed mode, the THREE.CubeCamera creation, update, render, etc. is all ta
 equiManaged.update( camera, scene );
 ```
 at any point in your code that you want to extract a panorama.
-The cube map created will be 4096x4096 and the exported panorama will be 4096x2048.
+The cube map created will be 2048x2048 and the exported panorama will be 4096x2048.
+*Note: The cubemap can easily be 4096x4096, but that seems to work on most mobiles, too*
 
 Demo of Managed mode: [Demo](http://clicktorelease.com/tools/CubemapToEquirectangular/index-managed.html)
 
