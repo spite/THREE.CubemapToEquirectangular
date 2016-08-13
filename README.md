@@ -2,6 +2,9 @@
 
 Helper to extract an equirectangular panorama PNG from any three.js scene.
 
+Here's a demo with some cubes: [Demo](http://clicktorelease.com/tools/CubemapToEquirectangular/index-managed.html)
+
+
 ![](https://raw.githubusercontent.com/spite/THREE.CubemapToEquirectangular/master/about/pano-cru%C2%B7ci%C2%B7form-1471040116139.jpg)
 ![](https://raw.githubusercontent.com/spite/THREE.CubemapToEquirectangular/master/about/pano-The%20Polygon%20Shredder-1471041904038.jpg)
 
@@ -32,6 +35,9 @@ equiManaged.update( camera, scene );
 at any point in your code that you want to extract a panorama.
 The cube map created will be 4096x4096 and the exported panorama will be 4096x2048.
 
+Demo of Managed mode: [Demo](http://clicktorelease.com/tools/CubemapToEquirectangular/index-managed.html)
+
+
 #### Unmanaged CubemapToEquirectangular ####
 If you want to use a different CubeMap camera, or do something custom with the render, you will have to set the Unmanaged mode.
 
@@ -49,11 +55,25 @@ cubeCamera.updateCubeMap( renderer, scene );
 equiUnmanaged.convert( cubeCamera );
 ```
 
+Demo of Unmanaged mode: [Demo](http://clicktorelease.com/tools/CubemapToEquirectangular/index-unmanaged.html)
+
 #### Changing output size ####
 To export a different size, call ```setSize( width, height )```:
 ```
 equi.setSize( 2048, 1024 );
 ```
+
+#### Notes ###
+
+Built using ES6 template strings.
+Needs canvas.toBlob, polyfill in the examples folder
+
+#### TODO ####
+
+- Add importance sampling
+- Handle postprocessing
+- Handle Safari not supporting download attribute
+- Let users have more control over file name, callbacks, progress
 
 #### License ####
 
