@@ -2,6 +2,9 @@
 
 Helper to extract an equirectangular panorama PNG from any three.js scene.
 
+![](https://raw.githubusercontent.com/spite/THREE.CubemapToEquirectangular/master/about/pano-cru%C2%B7ci%C2%B7form-1471040116139.jpg)
+![](https://raw.githubusercontent.com/spite/THREE.CubemapToEquirectangular/master/about/pano-The%20Polygon%20Shredder-1471041904038.jpg)
+
 #### How to use ####
 Include script after THREE is included
 ```
