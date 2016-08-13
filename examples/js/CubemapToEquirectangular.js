@@ -77,8 +77,11 @@ function CubemapToEquirectangular( renderer, provideCubeCamera ) {
 
 	this.setSize( 4096, 2048 );
 
+	var gl = this.renderer.getContext();
+	this.cubeMapSize = gl.getParameter( gl.MAX_CUBE_MAP_TEXTURE_SIZE )
+
 	if( provideCubeCamera ) {
-		this.getCubeCamera( 4096 )
+		this.getCubeCamera( 2048 )
 	}
 
 }
@@ -113,7 +116,7 @@ CubemapToEquirectangular.prototype.setSize = function( width, height ) {
 
 CubemapToEquirectangular.prototype.getCubeCamera = function( size ) {
 
-	this.cubeCamera = new THREE.CubeCamera( .1, 1000, size );
+	this.cubeCamera = new THREE.CubeCamera( .1, 1000, Math.min( this.cubeMapSize, size ) );
 	return this.cubeCamera;
 
 }

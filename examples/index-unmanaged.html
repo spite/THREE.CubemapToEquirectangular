@@ -29,6 +29,7 @@
 
 	<div id="capture" >Capture</div>
 
+	<script src="js/canvas.toBlob-polyfill.js"></script>
 	<script src="js/three.min.js"></script>
 	<script src="js/OrbitControls.js"></script>
 	<script src="js/CubemapToEquirectangular.js"></script>
@@ -95,7 +96,7 @@
 			container.appendChild(renderer.domElement);
 
 			equi = new THREE.CubemapToEquirectangular( renderer, false );
-			cubeCamera = new THREE.CubeCamera( .1, 1000, 4096 );
+			cubeCamera = new THREE.CubeCamera( .1, 1000, 2048 );
 
 			controls = new THREE.OrbitControls( camera, renderer.domElement );
 
