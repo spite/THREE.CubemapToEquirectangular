@@ -71,7 +71,8 @@ Needs canvas.toBlob, polyfill in the examples folder
 
 #### TODO ####
 
-- Fix for Android (if it's a relevant use case)
+~~- Fix for Android (if it's a relevant use case)~~ (seems to work with 2048x2048)
+- Check for mobile (if it's a relevant use case)
 - Add importance sampling (improves quality of output)
 - Handle postprocessing
 - Handle Safari not supporting download attribute
