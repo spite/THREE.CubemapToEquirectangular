@@ -4,10 +4,10 @@
 		var i = new ImageData( new Uint8ClampedArray( [ 1, 1, 1, 1 ] ), 1, 1 );
 	} catch( e ) {
 		window.ImageData = function( data, width, height ) {
-			var canvas = document.createElement('canvas');
+			var canvas = document.createElement( 'canvas' );
 			var ctx = canvas.getContext( '2d' );
-			var imageData = canvas.getContext('2d').createImageData(width, height);
-			imageData.data.set(data);
+			var imageData = ctx.createImageData( width, height );
+			imageData.data.set( data );
 			return imageData
 		}
 	}
