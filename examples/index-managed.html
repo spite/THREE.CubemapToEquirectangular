@@ -9,12 +9,25 @@
 		body {
 			font-family: Monospace;
 			background-color: #f0f0f0;
+			color: white;
 			margin: 0px;
 			overflow: hidden;
+		}
+		#capture{
+			position: absolute;
+			left: 20px;
+			top: 20px;
+			padding: 10px;
+			border: 1px solid white;
+			z-index: 100;
+			cursor: pointer;
+			background-color: rgba( 0,0,0,.4);
 		}
 	</style>
 </head>
 <body>
+
+	<div id="capture" >Capture</div>
 
 	<script src="js/three.min.js"></script>
 	<script src="js/OrbitControls.js"></script>
@@ -88,11 +101,9 @@
 			window.addEventListener( 'resize', onWindowResize, false );
 			onWindowResize();
 
-			window.addEventListener( 'keydown', function( e ) {
+			document.getElementById( 'capture' ).addEventListener( 'click', function( e ) {
 
-				if( e.keyCode === 32 ) {
-					equi.update( camera, scene );
-				}
+				equi.update( camera, scene );
 
 			} );
 
