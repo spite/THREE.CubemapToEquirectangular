@@ -70,7 +70,8 @@ Needs canvas.toBlob, polyfill in the examples folder
 
 #### TODO ####
 
-- Add importance sampling
+- Fix for Android (if it's a relevant use case)
+- Add importance sampling (improves quality of output)
 - Handle postprocessing
 - Handle Safari not supporting download attribute
 - Let users have more control over file name, callbacks, progress
