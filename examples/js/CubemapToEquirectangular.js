@@ -72,12 +72,6 @@ function CubemapToEquirectangular( renderer, provideCubeCamera ) {
 	this.canvas = document.createElement( 'canvas' );
 	this.ctx = this.canvas.getContext( '2d' );
 
-	document.body.appendChild( this.canvas );
-	this.canvas.style.position = 'absolute';
-	this.canvas.style.left = this.canvas.style.top = 0
-	this.canvas.style.width = '200px';
-	this.canvas.style.height = '100px'
-
 	this.cubeCamera = null;
 	this.attachedCamera = null;
 
