@@ -85,6 +85,8 @@
 				object.scale.y = Math.random() + 0.5;
 				object.scale.z = Math.random() + 0.5;
 
+				object.material.color.setRGB( object.position.x / 800 + .5, object.position.y / 800 + .5, object.position.z / 800 + .5 );
+
 				scene.add( object );
 
 			}
