@@ -11,7 +11,7 @@ varying vec2 vUv;
 
 void main()  {
 
-	vUv = uv;
+	vUv = vec2( 1.- uv.x, uv.y );
 	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 }
@@ -30,7 +30,7 @@ void main()  {
 
 	vec2 uv = vUv;
 
-	float longitude = uv.x * 2. * M_PI;
+	float longitude = uv.x * 2. * M_PI - M_PI + M_PI / 2.;
 	float latitude = uv.y * M_PI;
 
 	vec3 dir = vec3(
