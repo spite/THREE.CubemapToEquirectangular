@@ -10,11 +10,11 @@ Here's a demo with some cubes: [Demo](http://clicktorelease.com/tools/CubemapToE
 
 #### How to use ####
 Include script after THREE is included
-```
+```js
 <script src="CubemapToEquirectangular.js"></script>
 ```
 Define a new instance of THREE.CubemapToEquirectangular.
-```
+```js
 // create renderer, scene, camera, etc.
 var renderer = new THREE.WebGLRenderer();
 var scene = new THREE.Scene();
@@ -29,7 +29,7 @@ var equiUnmanaged = new THREE.CubemapToEquirectangular( renderer, false );
 
 #### Managed CubemapToEquirectangular ####
 With Managed mode, the THREE.CubeCamera creation, update, render, etc. is all taken care of. You only have to call:
-```
+```js
 equiManaged.update( camera, scene );
 ```
 at any point in your code that you want to extract a panorama.
@@ -43,11 +43,11 @@ Demo of Managed mode: [Demo](http://clicktorelease.com/tools/CubemapToEquirectan
 If you want to use a different CubeMap camera, or do something custom with the render, you will have to set the Unmanaged mode.
 
 You will have to create and manage your THREE.CubeCamera:
-```
+```js
 var cubeCamera = new THREE.CubeCamera( .1, 1000, 4096 );
 ```
 and manage all your scene update and rendering. When you want to export a panorama, call:
-```
+```js
 // this is where the developer updates the scene and creates a cubemap of the scene
 cubeCamera.position.copy( camera.position );
 cubeCamera.updateCubeMap( renderer, scene );
@@ -60,7 +60,7 @@ Demo of Unmanaged mode: [Demo](http://clicktorelease.com/tools/CubemapToEquirect
 
 #### Changing output size ####
 To export a different size, call ```setSize( width, height )```:
-```
+```js
 equi.setSize( 2048, 1024 );
 ```
 
