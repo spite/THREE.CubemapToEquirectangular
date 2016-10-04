@@ -130,7 +130,7 @@ CubemapToEquirectangular.prototype.attachCubeCamera = function( camera ) {
 
 CubemapToEquirectangular.prototype.convert = function( cubeCamera ) {
 
-	this.quad.material.uniforms.map.value = cubeCamera.renderTarget;
+	this.quad.material.uniforms.map.value = cubeCamera.renderTarget.texture;
 	this.renderer.render( this.scene, this.camera, this.output, true );
 
 	var pixels = new Uint8Array( 4 * this.width * this.height );
