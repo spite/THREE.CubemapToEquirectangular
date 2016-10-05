@@ -1,4 +1,4 @@
-require('../build/CubemapToEquirectangular.js');
+require('three.cubemap-to-equirectangular.js');
 
 var equi;
 
