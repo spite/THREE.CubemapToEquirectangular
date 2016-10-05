@@ -1,0 +1,29 @@
+{
+  "name": "three.cubemap-to-equirectangular",
+  "version": "1.0.0",
+  "description": "Export an equirectangular panorama image from a three.js scene",
+  "main": "build/CubemapToEquirectangular.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spite/THREE.CubemapToEquirectangular.git"
+  },
+  "keywords": [
+    "canvas",
+    "three.js",
+    "equirectangular",
+    "panorama",
+    "cubemap"
+  ],
+  "author": "Jaume Sanchez <the.spite@gmail.com> (https://www.clicktorelease.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/spite/THREE.CubemapToEquirectangular/issues"
+  },
+  "homepage": "https://github.com/spite/THREE.CubemapToEquirectangular#readme"
+}
