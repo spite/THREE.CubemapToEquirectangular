@@ -1,0 +1,39 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>CubemapToEquirectangular - Unmanaged</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<style>
+		body {
+			font-family: Monospace;
+			background-color: #f0f0f0;
+			color: white;
+			margin: 0px;
+			overflow: hidden;
+		}
+		#capture{
+			position: absolute;
+			left: 20px;
+			top: 20px;
+			padding: 10px;
+			border: 1px solid white;
+			z-index: 100;
+			cursor: pointer;
+			background-color: rgba( 0,0,0,.4);
+		}
+	</style>
+</head>
+<body>
+
+	<div id="capture" >Capture</div>
+
+	<script src="js/ImageData-polyfill.js"></script>
+	<script src="js/canvas.toBlob-polyfill.js"></script>
+	<script src="js/three.min.js"></script>
+	<script src="js/OrbitControls.js"></script>
+	<script src="bundle.js" ></script>
+
+</body>
+</html>
