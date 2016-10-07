@@ -17,9 +17,10 @@ or use npm to install it
 ```
 npm i three.cubemap-to-equirectangular
 ```
-and include it in your code with
+and include it in your code with (remember to require three.js)
 ```js
-require('three.cubemap-to-equirectangular.js');
+var THREE = require('three');
+var CubemapToEquirectangular = require('three.cubemap-to-equirectangular');
 ```
 
 Define a new instance of THREE.CubemapToEquirectangular.
@@ -30,10 +31,10 @@ var scene = new THREE.Scene();
 var camera = new THREE.Camera( /* ... */ );
 
 // Create a managed CubemapToEquirectangular
-var equiManaged = new THREE.CubemapToEquirectangular( renderer, true );
+var equiManaged = new CubemapToEquirectangular( renderer, true );
 
 // or create an unmanaged CubemapToEquirectangular
-var equiUnmanaged = new THREE.CubemapToEquirectangular( renderer, false );
+var equiUnmanaged = new CubemapToEquirectangular( renderer, false );
 ```
 
 #### Managed CubemapToEquirectangular ####
