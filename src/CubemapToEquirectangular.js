@@ -1,4 +1,14 @@
-( function() {
+;(function() {
+
+	"use strict";
+
+	var root = this
+
+	var has_require = typeof require !== 'undefined'
+
+	var THREE = root.THREE || has_require && require('three')
+	if( !THREE )
+		throw new Error( 'CubemapToEquirectangular requires three.js' )
 
 var vertexShader = `
 attribute vec3 position;
@@ -172,6 +182,14 @@ CubemapToEquirectangular.prototype.update = function( camera, scene ) {
 
 }
 
-window.THREE.CubemapToEquirectangular = CubemapToEquirectangular;
+if( typeof exports !== 'undefined' ) {
+	if( typeof module !== 'undefined' && module.exports ) {
+		exports = module.exports = CubemapToEquirectangular
+	}
+	exports.CubemapToEquirectangular = CubemapToEquirectangular
+}
+else {
+	root.CubemapToEquirectangular = CubemapToEquirectangular
+}
 
-} )();
+}).call(this);
