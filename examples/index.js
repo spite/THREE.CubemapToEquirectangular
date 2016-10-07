@@ -1,6 +1,6 @@
 var THREE = require('three');
 var OrbitControls = require('three-orbit-controls')(THREE)
-var CubemapToEquirectangular = require('../src/CubemapToEquirectangular.js');
+var CubemapToEquirectangular = require('three.cubemap-to-equirectangular');
 
 var equi;
 

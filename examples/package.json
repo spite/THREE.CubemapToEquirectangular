@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "three": "^0.81.2",
-    "three-orbit-controls": "^72.0.0"
+    "three-orbit-controls": "^72.0.0",
+    "three.cubemap-to-equirectangular": "^1.0.2"
   }
 }
