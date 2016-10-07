@@ -98,7 +98,7 @@
 			renderer.sortObjects = false;
 			container.appendChild(renderer.domElement);
 
-			equi = new THREE.CubemapToEquirectangular( renderer, false );
+			equi = new CubemapToEquirectangular( renderer, false );
 			cubeCamera = new THREE.CubeCamera( .1, 1000, 2048 );
 
 			controls = new THREE.OrbitControls( camera, renderer.domElement );

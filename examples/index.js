@@ -1,4 +1,6 @@
-require('three.cubemap-to-equirectangular.js');
+var THREE = require('three');
+var OrbitControls = require('three-orbit-controls')(THREE)
+var CubemapToEquirectangular = require('../src/CubemapToEquirectangular.js');
 
 var equi;
 
@@ -61,10 +63,10 @@ function init() {
 	renderer.sortObjects = false;
 	container.appendChild(renderer.domElement);
 
-	equi = new THREE.CubemapToEquirectangular( renderer, false );
+	equi = new CubemapToEquirectangular( renderer, false );
 	cubeCamera = new THREE.CubeCamera( .1, 1000, 2048 );
 
-	controls = new THREE.OrbitControls( camera, renderer.domElement );
+	controls = new OrbitControls( camera, renderer.domElement );
 
 	window.addEventListener( 'resize', onWindowResize, false );
 	onWindowResize();
