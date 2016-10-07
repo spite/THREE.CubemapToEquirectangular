@@ -1,6 +1,6 @@
 {
   "name": "three.cubemap-to-equirectangular",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "Export an equirectangular panorama image from a three.js scene",
   "main": "build/CubemapToEquirectangular.js",
   "directories": {
