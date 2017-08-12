@@ -50,7 +50,7 @@ void main()  {
 	);
 	normalize( dir );
 
-	gl_FragColor = vec4( textureCube( map, dir ).rgb, 1. );
+	gl_FragColor = textureCube( map, dir );
 
 }
 `;
@@ -68,7 +68,8 @@ function CubemapToEquirectangular( renderer, provideCubeCamera ) {
 		},
 		vertexShader: vertexShader,
 		fragmentShader: fragmentShader,
-		side: THREE.DoubleSide
+		side: THREE.DoubleSide,
+		transparent: true
 	} );
 
 	this.scene = new THREE.Scene();
@@ -126,7 +127,12 @@ CubemapToEquirectangular.prototype.setSize = function( width, height ) {
 
 CubemapToEquirectangular.prototype.getCubeCamera = function( size ) {
 
-	this.cubeCamera = new THREE.CubeCamera( .1, 1000, Math.min( this.cubeMapSize, size ) );
+	var cubeMapSize = Math.min( this.cubeMapSize, size );
+	this.cubeCamera = new THREE.CubeCamera( .1, 1000, cubeMapSize );
+
+	var options = { format: THREE.RGBAFormat, magFilter: THREE.LinearFilter, minFilter: THREE.LinearFilter };
+	this.cubeCamera.renderTarget = new THREE.WebGLRenderTargetCube( cubeMapSize, cubeMapSize, options );
+
 	return this.cubeCamera;
 
 }
@@ -157,7 +163,7 @@ CubemapToEquirectangular.prototype.convert = function( cubeCamera, download ) {
 };
 
 CubemapToEquirectangular.prototype.download = function( imageData ) {
-	
+
 	this.ctx.putImageData( imageData, 0, 0 );
 
 	this.canvas.toBlob( function( blob ) {
