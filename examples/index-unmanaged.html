@@ -91,8 +91,8 @@
 
 			}
 
-			renderer = new THREE.WebGLRenderer();
-			renderer.setClearColor( 0xf0f0f0 );
+			renderer = new THREE.WebGLRenderer( { alpha: false });
+			renderer.setClearColor( 0xf0f0f0, 1 );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.sortObjects = false;
@@ -100,6 +100,15 @@
 
 			equi = new CubemapToEquirectangular( renderer, false );
 			cubeCamera = new THREE.CubeCamera( .1, 1000, 2048 );
+
+			/*
+
+			// Use this to create a cubecamera with alpha support
+
+			var options = { format: THREE.RGBAFormat, magFilter: THREE.LinearFilter, minFilter: THREE.LinearFilter };
+			cubeCamera.renderTarget = new THREE.WebGLRenderTargetCube( 2048, 2048, options );
+
+			*/
 
 			controls = new THREE.OrbitControls( camera, renderer.domElement );
 
