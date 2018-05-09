@@ -186,7 +186,7 @@ CubemapToEquirectangular.prototype.download = function( imageData ) {
 
 };
 
-CubemapToEquirectangular.prototype.update = function( camera, scene ) {
+CubemapToEquirectangular.prototype.update = function( camera, scene, download ) {
 
 	var autoClear = this.renderer.autoClear;
 	this.renderer.autoClear = true;
@@ -194,7 +194,7 @@ CubemapToEquirectangular.prototype.update = function( camera, scene ) {
 	this.cubeCamera.updateCubeMap( this.renderer, scene );
 	this.renderer.autoClear = autoClear;
 
-	this.convert( this.cubeCamera );
+	return this.convert( this.cubeCamera, download );
 
 }
 
