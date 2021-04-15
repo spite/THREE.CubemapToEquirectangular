@@ -145,7 +145,8 @@ CubemapToEquirectangular.prototype.attachCubeCamera = function( camera ) {
 CubemapToEquirectangular.prototype.convert = function( cubeCamera, download ) {
 
 	this.quad.material.uniforms.map.value = cubeCamera.renderTarget.texture;
-	this.renderer.render( this.scene, this.camera, this.output, true );
+    this.renderer.setRenderTarget(this.output);
+	this.renderer.render( this.scene, this.camera);
 
 	var pixels = new Uint8Array( 4 * this.width * this.height );
 	this.renderer.readRenderTargetPixels( this.output, 0, 0, this.width, this.height, pixels );
@@ -155,6 +156,7 @@ CubemapToEquirectangular.prototype.convert = function( cubeCamera, download ) {
 	if( download !== false ) {
 		this.download( imageData );
 	}
+    this.renderer.setRenderTarget(null);
 
 	return imageData
 
@@ -189,7 +191,7 @@ CubemapToEquirectangular.prototype.update = function( camera, scene ) {
 	var autoClear = this.renderer.autoClear;
 	this.renderer.autoClear = true;
 	this.cubeCamera.position.copy( camera.position );
-	this.cubeCamera.updateCubeMap( this.renderer, scene );
+	this.cubeCamera.update( this.renderer, scene );
 	this.renderer.autoClear = autoClear;
 
 	this.convert( this.cubeCamera );
