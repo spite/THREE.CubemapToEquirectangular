@@ -127,11 +127,9 @@ CubemapToEquirectangular.prototype.setSize = function( width, height ) {
 
 CubemapToEquirectangular.prototype.getCubeCamera = function( size ) {
 
-	var cubeMapSize = Math.min( this.cubeMapSize, size );
-	this.cubeCamera = new THREE.CubeCamera( .1, 1000, cubeMapSize );
-
 	var options = { format: THREE.RGBAFormat, magFilter: THREE.LinearFilter, minFilter: THREE.LinearFilter };
-	this.cubeCamera.renderTarget = new THREE.WebGLRenderTargetCube( cubeMapSize, cubeMapSize, options );
+	const renderTarget = new THREE.WebGLCubeRenderTarget(size, options);
+	this.cubeCamera = new THREE.CubeCamera(.1, 1000, renderTarget );
 
 	return this.cubeCamera;
 

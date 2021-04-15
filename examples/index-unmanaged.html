@@ -98,8 +98,10 @@
 			renderer.sortObjects = false;
 			container.appendChild(renderer.domElement);
 
+			var options = { format: THREE.RGBAFormat, magFilter: THREE.LinearFilter, minFilter: THREE.LinearFilter };
+            var renderTarget = new THREE.WebGLCubeRenderTarget( 2048, options );
 			equi = new CubemapToEquirectangular( renderer, false );
-			cubeCamera = new THREE.CubeCamera( .1, 1000, 2048 );
+			cubeCamera = new THREE.CubeCamera( .1, 1000, renderTarget );
 
 			/*
 
