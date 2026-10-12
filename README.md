@@ -2,6 +2,10 @@
 
 Helper to extract an equirectangular panorama PNG from any three.js scene.
 
+#### Demos ####
+- **[Managed mode](https://spite.github.io/THREE.CubemapToEquirectangular/examples/index-managed.html)**: press Capture to download a panorama of the scene
+- **[Unmanaged mode](https://spite.github.io/THREE.CubemapToEquirectangular/examples/index-unmanaged.html)**: the same, with a cube camera created by the page
+
 #### 2026 update ####
 **Disclaimer:** this library is from 2016. It has been rewritten for current three.js, so code written for version 1.x needs changes
 
@@ -13,9 +17,6 @@ three.js still doesn't have this built in (checked on r186). What changed from t
 - managed mode follows the world position, near, far and layers of the camera
 - the cube map is filtered with mipmaps, so the panorama is smoother
 - ```update()``` returns the panorama and can skip the download, and there's a ```dispose()```
-
-Here's a demo with some cubes: [Demo](https://spite.github.io/THREE.CubemapToEquirectangular/examples/index-managed.html)
-
 
 ![](https://raw.githubusercontent.com/spite/THREE.CubemapToEquirectangular/master/about/pano-cru%C2%B7ci%C2%B7form-1471040116139.jpg)
 ![](https://raw.githubusercontent.com/spite/THREE.CubemapToEquirectangular/master/about/pano-The%20Polygon%20Shredder-1471041904038.jpg)
