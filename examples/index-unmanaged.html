@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -29,33 +28,34 @@
 
 	<div id="capture" >Capture</div>
 
-	<script src="js/ImageData-polyfill.js"></script>
-	<script src="js/canvas.toBlob-polyfill.js"></script>
-	<script src="js/three.min.js"></script>
-	<script src="js/OrbitControls.js"></script>
-	<script src="js/CubemapToEquirectangular.js"></script>
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js",
+				"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"
+			}
+		}
+	</script>
 
-	<script>
+	<script type="module">
 
-		var equi;
+		import * as THREE from 'three';
+		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+		import { CubemapToEquirectangular } from '../src/CubemapToEquirectangular.js';
 
-		var container, stats;
-		var camera, scene, renderer;
-		var controls;
+		let equi;
 
-		var radius = 100, theta = 0;
+		let camera, scene, renderer;
+		let controls;
 
-		window.addEventListener( 'load', function() {
-			init();
-			animate();
-		});
+		let cubeCamera;
 
-		var cubeCamera;
-		var sphere;
+		init();
+		animate();
 
 		function init() {
 
-			container = document.createElement( 'div' );
+			const container = document.createElement( 'div' );
 			document.body.appendChild( container );
 
 			camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
@@ -63,15 +63,15 @@
 
 			scene = new THREE.Scene();
 
-			var light = new THREE.DirectionalLight( 0xffffff, 1 );
+			const light = new THREE.DirectionalLight( 0xffffff, 3 );
 			light.position.set( 1, 1, 1 ).normalize();
 			scene.add( light );
 
-			var geometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
+			const geometry = new THREE.BoxGeometry( 20, 20, 20 );
 
-			for ( var i = 0; i < 2000; i ++ ) {
+			for ( let i = 0; i < 2000; i ++ ) {
 
-				var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
+				const object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial() );
 
 				object.position.x = Math.random() * 800 - 400;
 				object.position.y = Math.random() * 800 - 400;
@@ -85,7 +85,7 @@
 				object.scale.y = Math.random() + 0.5;
 				object.scale.z = Math.random() + 0.5;
 
-				object.material.color.setRGB( object.position.x / 800 + .5, object.position.y / 800 + .5, object.position.z / 800 + .5 );
+				object.material.color.setRGB( object.position.x / 800 + .5, object.position.y / 800 + .5, object.position.z / 800 + .5, THREE.SRGBColorSpace );
 
 				scene.add( object );
 
@@ -99,18 +99,15 @@
 			container.appendChild(renderer.domElement);
 
 			equi = new CubemapToEquirectangular( renderer, false );
-			cubeCamera = new THREE.CubeCamera( .1, 1000, 2048 );
 
-			/*
+			// half float keeps the linear colors intact, mipmaps let the panorama be filtered
+			cubeCamera = new THREE.CubeCamera( .1, 1000, new THREE.WebGLCubeRenderTarget( 2048, {
+				type: THREE.HalfFloatType,
+				generateMipmaps: true,
+				minFilter: THREE.LinearMipmapLinearFilter
+			} ) );
 
-			// Use this to create a cubecamera with alpha support
-
-			var options = { format: THREE.RGBAFormat, magFilter: THREE.LinearFilter, minFilter: THREE.LinearFilter };
-			cubeCamera.renderTarget = new THREE.WebGLRenderTargetCube( 2048, 2048, options );
-
-			*/
-
-			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls = new OrbitControls( camera, renderer.domElement );
 
 			window.addEventListener( 'resize', onWindowResize, false );
 			onWindowResize();
@@ -118,7 +115,7 @@
 			document.getElementById( 'capture' ).addEventListener( 'click', function( e ) {
 
 				cubeCamera.position.copy( camera.position );
-				cubeCamera.updateCubeMap( renderer, scene );
+				cubeCamera.update( renderer, scene );
 				equi.convert( cubeCamera );
 
 			} );

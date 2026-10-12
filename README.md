@@ -2,39 +2,48 @@
 
 Helper to extract an equirectangular panorama PNG from any three.js scene.
 
-Here's a demo with some cubes: [Demo](http://clicktorelease.com/tools/CubemapToEquirectangular/index-managed.html)
+#### 2026 update ####
+**Disclaimer:** this library is from 2016. It has been rewritten for current three.js, so code written for version 1.x needs changes
+
+three.js still doesn't have this built in (checked on r186). What changed from the 2016 version:
+
+- it's an ES module, and it needs three.js r155 or later and WebGL 2
+- the colors of the panorama match the canvas. three.js now renders linear colors into render targets, so the output color space and the tone mapping of the renderer are applied to the panorama. With tone mapping the background is tone mapped too, like in three.js post-processing
+- the panorama follows the equirectangular convention of three.js, with +X at the center of the image, so it lines up with the scene when it's loaded back as an equirectangular texture. Version 1.x was rotated 180° around the vertical axis
+- managed mode follows the world position, near, far and layers of the camera
+- the cube map is filtered with mipmaps, so the panorama is smoother
+- ```update()``` returns the panorama and can skip the download, and there's a ```dispose()```
+
+Here's a demo with some cubes: [Demo](https://spite.github.io/THREE.CubemapToEquirectangular/examples/index-managed.html)
 
 
 ![](https://raw.githubusercontent.com/spite/THREE.CubemapToEquirectangular/master/about/pano-cru%C2%B7ci%C2%B7form-1471040116139.jpg)
 ![](https://raw.githubusercontent.com/spite/THREE.CubemapToEquirectangular/master/about/pano-The%20Polygon%20Shredder-1471041904038.jpg)
 
 #### How to use ####
-Include script after THREE is included
+Use npm to install it, alongside three.js
+```
+npm i three three.cubemap-to-equirectangular
+```
+and import it in your code
 ```js
-<script src="CubemapToEquirectangular.js"></script>
+import * as THREE from 'three';
+import { CubemapToEquirectangular } from 'three.cubemap-to-equirectangular';
 ```
-or use npm to install it
-```
-npm i three.cubemap-to-equirectangular
-```
-and include it in your code with (remember to require three.js)
-```js
-var THREE = require('three');
-var CubemapToEquirectangular = require('three.cubemap-to-equirectangular');
-```
+It's a plain ES module, so it also works without a bundler as long as an import map resolves `three` and `three/addons/` (see [examples/index-managed.html](examples/index-managed.html)).
 
-Define a new instance of THREE.CubemapToEquirectangular.
+Define a new instance of CubemapToEquirectangular.
 ```js
 // create renderer, scene, camera, etc.
-var renderer = new THREE.WebGLRenderer();
-var scene = new THREE.Scene();
-var camera = new THREE.Camera( /* ... */ );
+const renderer = new THREE.WebGLRenderer();
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera( /* ... */ );
 
 // Create a managed CubemapToEquirectangular
-var equiManaged = new CubemapToEquirectangular( renderer, true );
+const equiManaged = new CubemapToEquirectangular( renderer, true );
 
 // or create an unmanaged CubemapToEquirectangular
-var equiUnmanaged = new CubemapToEquirectangular( renderer, false );
+const equiUnmanaged = new CubemapToEquirectangular( renderer, false );
 ```
 
 #### Managed CubemapToEquirectangular ####
@@ -46,7 +55,12 @@ at any point in your code that you want to extract a panorama.
 The cube map created will be 2048x2048 and the exported panorama will be 4096x2048.
 *Note: The cubemap can easily be 4096x4096, but that seems to work on most mobiles, too*
 
-Demo of Managed mode: [Demo](http://clicktorelease.com/tools/CubemapToEquirectangular/index-managed.html)
+```update()``` returns the panorama as an ImageData. To get it without downloading the PNG, call:
+```js
+const imageData = equiManaged.update( camera, scene, false );
+```
+
+Demo of Managed mode: [Demo](https://spite.github.io/THREE.CubemapToEquirectangular/examples/index-managed.html)
 
 
 #### Unmanaged CubemapToEquirectangular ####
@@ -54,19 +68,25 @@ If you want to use a different CubeMap camera, or do something custom with the r
 
 You will have to create and manage your THREE.CubeCamera:
 ```js
-var cubeCamera = new THREE.CubeCamera( .1, 1000, 4096 );
+const cubeCamera = new THREE.CubeCamera( .1, 1000, new THREE.WebGLCubeRenderTarget( 4096, {
+  type: THREE.HalfFloatType,
+  generateMipmaps: true,
+  minFilter: THREE.LinearMipmapLinearFilter
+} ) );
 ```
-and manage all your scene update and rendering. When you want to export a panorama, call:
+The half float type keeps the linear colors of the render intact, and the mipmaps let the panorama be filtered.
+
+Then manage all your scene update and rendering. When you want to export a panorama, call:
 ```js
 // this is where the developer updates the scene and creates a cubemap of the scene
 cubeCamera.position.copy( camera.position );
-cubeCamera.updateCubeMap( renderer, scene );
+cubeCamera.update( renderer, scene );
 
 // call this to convert the cubemap rendertarget to a panorama
 equiUnmanaged.convert( cubeCamera );
 ```
 
-Demo of Unmanaged mode: [Demo](http://clicktorelease.com/tools/CubemapToEquirectangular/index-unmanaged.html)
+Demo of Unmanaged mode: [Demo](https://spite.github.io/THREE.CubemapToEquirectangular/examples/index-unmanaged.html)
 
 #### Changing output size ####
 To export a different size, call ```setSize( width, height )```:
@@ -74,10 +94,14 @@ To export a different size, call ```setSize( width, height )```:
 equi.setSize( 2048, 1024 );
 ```
 
-#### Notes ###
+#### Cleaning up ####
+To release the render targets when you're done, call ```dispose()```:
+```js
+equi.dispose();
+```
 
-Built using ES6 template strings.
-Needs canvas.toBlob, polyfill in the examples folder
+#### Requirements ####
+three.js r155 or later, and WebGL 2. For three.js r116 and earlier use version 1.x of this library.
 
 #### TODO ####
 

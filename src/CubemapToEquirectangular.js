@@ -1,211 +1,230 @@
-;(function() {
+import {
+	Camera,
+	CubeCamera,
+	HalfFloatType,
+	LinearMipmapLinearFilter,
+	Mesh,
+	NoBlending,
+	PlaneGeometry,
+	ShaderMaterial,
+	WebGLCubeRenderTarget,
+	WebGLRenderTarget
+} from 'three';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
-	"use strict";
+const vertexShader = /* glsl */`
 
-	var root = this
+	varying vec2 vUv;
 
-	var has_require = typeof require !== 'undefined'
+	void main() {
 
-	var THREE = root.THREE || has_require && require('three')
-	if( !THREE )
-		throw new Error( 'CubemapToEquirectangular requires three.js' )
+		vUv = uv;
+		gl_Position = vec4( position.xy, 0.0, 1.0 );
 
-var vertexShader = `
-attribute vec3 position;
-attribute vec2 uv;
-
-uniform mat4 projectionMatrix;
-uniform mat4 modelViewMatrix;
-
-varying vec2 vUv;
-
-void main()  {
-
-	vUv = vec2( 1.- uv.x, uv.y );
-	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-
-}
-`;
-
-var fragmentShader = `
-precision mediump float;
-
-uniform samplerCube map;
-
-varying vec2 vUv;
-
-#define M_PI 3.1415926535897932384626433832795
-
-void main()  {
-
-	vec2 uv = vUv;
-
-	float longitude = uv.x * 2. * M_PI - M_PI + M_PI / 2.;
-	float latitude = uv.y * M_PI;
-
-	vec3 dir = vec3(
-		- sin( longitude ) * sin( latitude ),
-		cos( latitude ),
-		- cos( longitude ) * sin( latitude )
-	);
-	normalize( dir );
-
-	gl_FragColor = textureCube( map, dir );
-
-}
-`;
-
-function CubemapToEquirectangular( renderer, provideCubeCamera ) {
-
-	this.width = 1;
-	this.height = 1;
-
-	this.renderer = renderer;
-
-	this.material = new THREE.RawShaderMaterial( {
-		uniforms: {
-			map: { type: 't', value: null }
-		},
-		vertexShader: vertexShader,
-		fragmentShader: fragmentShader,
-		side: THREE.DoubleSide,
-		transparent: true
-	} );
-
-	this.scene = new THREE.Scene();
-	this.quad = new THREE.Mesh(
-		new THREE.PlaneBufferGeometry( 1, 1 ),
-		this.material
-	);
-	this.scene.add( this.quad );
-	this.camera = new THREE.OrthographicCamera( 1 / - 2, 1 / 2, 1 / 2, 1 / - 2, -10000, 10000 );
-
-	this.canvas = document.createElement( 'canvas' );
-	this.ctx = this.canvas.getContext( '2d' );
-
-	this.cubeCamera = null;
-	this.attachedCamera = null;
-
-	this.setSize( 4096, 2048 );
-
-	var gl = this.renderer.getContext();
-	this.cubeMapSize = gl.getParameter( gl.MAX_CUBE_MAP_TEXTURE_SIZE )
-
-	if( provideCubeCamera ) {
-		this.getCubeCamera( 2048 )
 	}
 
-}
+`;
 
-CubemapToEquirectangular.prototype.setSize = function( width, height ) {
+const fragmentShader = /* glsl */`
 
-	this.width = width;
-	this.height = height;
+	uniform highp samplerCube map;
 
-	this.quad.scale.set( this.width, this.height, 1 );
+	varying vec2 vUv;
 
-	this.camera.left = this.width / - 2;
-	this.camera.right = this.width / 2;
-	this.camera.top = this.height / 2;
-	this.camera.bottom = this.height / - 2;
+	const float PI = 3.141592653589793;
 
-	this.camera.updateProjectionMatrix();
+	void main() {
 
-	this.output = new THREE.WebGLRenderTarget( this.width, this.height, {
-		minFilter: THREE.LinearFilter,
-		magFilter: THREE.LinearFilter,
-		wrapS: THREE.ClampToEdgeWrapping,
-		wrapT: THREE.ClampToEdgeWrapping,
-		format: THREE.RGBAFormat,
-		type: THREE.UnsignedByteType
-	});
+		// rows run top to bottom, so the pixels read back are the image the right way up
+		float longitude = ( vUv.x - 0.5 ) * 2.0 * PI;
+		float latitude = ( 0.5 - vUv.y ) * PI;
 
-	this.canvas.width = this.width;
-	this.canvas.height = this.height;
+		vec3 direction = vec3(
+			cos( latitude ) * cos( longitude ),
+			sin( latitude ),
+			cos( latitude ) * sin( longitude )
+		);
 
-}
+		// explicit LOD from the angular footprint, implicit derivatives blur a line along the cube edges
+		float major = max( max( abs( direction.x ), abs( direction.y ) ), abs( direction.z ) );
+		float angle = max( length( dFdx( direction ) ), length( dFdy( direction ) ) );
+		float texels = angle * float( textureSize( map, 0 ).x ) * 0.5 / ( major * sqrt( major ) );
 
-CubemapToEquirectangular.prototype.getCubeCamera = function( size ) {
+		gl_FragColor = textureLod( map, direction, log2( texels ) );
 
-	var cubeMapSize = Math.min( this.cubeMapSize, size );
-	this.cubeCamera = new THREE.CubeCamera( .1, 1000, cubeMapSize );
-
-	var options = { format: THREE.RGBAFormat, magFilter: THREE.LinearFilter, minFilter: THREE.LinearFilter };
-	this.cubeCamera.renderTarget = new THREE.WebGLRenderTargetCube( cubeMapSize, cubeMapSize, options );
-
-	return this.cubeCamera;
-
-}
-
-CubemapToEquirectangular.prototype.attachCubeCamera = function( camera ) {
-
-	this.getCubeCamera();
-	this.attachedCamera = camera;
-
-}
-
-CubemapToEquirectangular.prototype.convert = function( cubeCamera, download ) {
-
-	this.quad.material.uniforms.map.value = cubeCamera.renderTarget.texture;
-	this.renderer.render( this.scene, this.camera, this.output, true );
-
-	var pixels = new Uint8Array( 4 * this.width * this.height );
-	this.renderer.readRenderTargetPixels( this.output, 0, 0, this.width, this.height, pixels );
-
-	var imageData = new ImageData( new Uint8ClampedArray( pixels ), this.width, this.height );
-
-	if( download !== false ) {
-		this.download( imageData );
 	}
 
-	return imageData
+`;
 
-};
+class CubemapToEquirectangular {
 
-CubemapToEquirectangular.prototype.download = function( imageData ) {
+	constructor( renderer, provideCubeCamera ) {
 
-	this.ctx.putImageData( imageData, 0, 0 );
+		this.width = 1;
+		this.height = 1;
 
-	this.canvas.toBlob( function( blob ) {
+		this.renderer = renderer;
 
-		var url = URL.createObjectURL(blob);
-		var fileName = 'pano-' + document.title + '-' + Date.now() + '.png';
-		var anchor = document.createElement( 'a' );
-		anchor.href = url;
-		anchor.setAttribute("download", fileName);
-		anchor.className = "download-js-link";
-		anchor.innerHTML = "downloading...";
-		anchor.style.display = "none";
-		document.body.appendChild(anchor);
-		setTimeout(function() {
+		this.material = new ShaderMaterial( {
+			uniforms: { map: { value: null } },
+			vertexShader,
+			fragmentShader,
+			blending: NoBlending,
+			depthTest: false,
+			depthWrite: false
+		} );
+
+		this.quad = new Mesh( new PlaneGeometry( 2, 2 ), this.material );
+		this.quad.frustumCulled = false;
+		this.camera = new Camera();
+
+		// the panorama in linear HDR, then tone mapped and encoded like the screen into output
+		this.linear = new WebGLRenderTarget( 1, 1, { type: HalfFloatType, depthBuffer: false } );
+		this.output = new WebGLRenderTarget( 1, 1, { depthBuffer: false } );
+		this.outputPass = new OutputPass();
+
+		this.cubeCamera = null;
+		this.cubeMapSize = renderer.capabilities.maxCubemapSize;
+
+		this.setSize( 4096, 2048 );
+
+		if ( provideCubeCamera ) {
+
+			this.getCubeCamera( 2048 );
+
+		}
+
+	}
+
+	setSize( width, height ) {
+
+		const max = this.renderer.capabilities.maxTextureSize;
+
+		if ( ! ( width >= 1 && width <= max && height >= 1 && height <= max ) ) {
+
+			throw new RangeError( 'CubemapToEquirectangular: width and height must be between 1 and ' + max + ', got ' + width + 'x' + height );
+
+		}
+
+		this.width = Math.floor( width );
+		this.height = Math.floor( height );
+
+		this.linear.setSize( this.width, this.height );
+		this.output.setSize( this.width, this.height );
+
+	}
+
+	getCubeCamera( size ) {
+
+		if ( this.cubeCamera ) this.cubeCamera.renderTarget.dispose();
+
+		const renderTarget = new WebGLCubeRenderTarget( Math.min( this.cubeMapSize, size ), {
+			type: HalfFloatType,
+			generateMipmaps: true,
+			minFilter: LinearMipmapLinearFilter
+		} );
+
+		this.cubeCamera = new CubeCamera( .1, 1000, renderTarget );
+
+		return this.cubeCamera;
+
+	}
+
+	convert( cubeCamera, download ) {
+
+		const renderer = this.renderer;
+		const renderTarget = renderer.getRenderTarget();
+		const cubeFace = renderer.getActiveCubeFace();
+		const mipmapLevel = renderer.getActiveMipmapLevel();
+
+		this.material.uniforms.map.value = cubeCamera.renderTarget.texture;
+		renderer.setRenderTarget( this.linear );
+		renderer.render( this.quad, this.camera );
+		this.material.uniforms.map.value = null;
+
+		this.outputPass.render( renderer, this.output, this.linear );
+
+		const pixels = new Uint8Array( 4 * this.width * this.height );
+		renderer.readRenderTargetPixels( this.output, 0, 0, this.width, this.height, pixels );
+
+		renderer.setRenderTarget( renderTarget, cubeFace, mipmapLevel );
+
+		const imageData = new ImageData( new Uint8ClampedArray( pixels.buffer ), this.width, this.height );
+
+		if ( download !== false ) {
+
+			this.download( imageData );
+
+		}
+
+		return imageData;
+
+	}
+
+	download( imageData ) {
+
+		const canvas = document.createElement( 'canvas' );
+		canvas.width = imageData.width;
+		canvas.height = imageData.height;
+		canvas.getContext( '2d' ).putImageData( imageData, 0, 0 );
+
+		canvas.toBlob( function( blob ) {
+
+			const url = URL.createObjectURL( blob );
+			const anchor = document.createElement( 'a' );
+			anchor.href = url;
+			anchor.download = 'pano-' + document.title + '-' + Date.now() + '.png';
+			anchor.style.display = 'none';
+			document.body.appendChild( anchor );
 			anchor.click();
-			document.body.removeChild(anchor);
-		}, 1 );
+			document.body.removeChild( anchor );
+			setTimeout( function() { URL.revokeObjectURL( url ); }, 1000 );
 
-	}, 'image/png' );
+		}, 'image/png' );
 
-};
-
-CubemapToEquirectangular.prototype.update = function( camera, scene ) {
-
-	var autoClear = this.renderer.autoClear;
-	this.renderer.autoClear = true;
-	this.cubeCamera.position.copy( camera.position );
-	this.cubeCamera.updateCubeMap( this.renderer, scene );
-	this.renderer.autoClear = autoClear;
-
-	this.convert( this.cubeCamera );
-
-}
-
-if( typeof exports !== 'undefined' ) {
-	if( typeof module !== 'undefined' && module.exports ) {
-		exports = module.exports = CubemapToEquirectangular
 	}
-	exports.CubemapToEquirectangular = CubemapToEquirectangular
-}
-else {
-	root.CubemapToEquirectangular = CubemapToEquirectangular
+
+	update( camera, scene, download ) {
+
+		const renderer = this.renderer;
+		const cubeCamera = this.cubeCamera || this.getCubeCamera( 2048 );
+
+		camera.getWorldPosition( cubeCamera.position );
+		cubeCamera.layers.mask = camera.layers.mask;
+
+		if ( camera.near !== undefined && camera.far !== undefined ) {
+
+			for ( const face of cubeCamera.children ) {
+
+				face.near = camera.near;
+				face.far = camera.far;
+				face.updateProjectionMatrix();
+
+			}
+
+		}
+
+		const autoClear = renderer.autoClear;
+		renderer.autoClear = true;
+		cubeCamera.update( renderer, scene );
+		renderer.autoClear = autoClear;
+
+		return this.convert( cubeCamera, download );
+
+	}
+
+	dispose() {
+
+		this.material.dispose();
+		this.quad.geometry.dispose();
+		this.linear.dispose();
+		this.output.dispose();
+		this.outputPass.dispose();
+
+		if ( this.cubeCamera ) this.cubeCamera.renderTarget.dispose();
+
+	}
+
 }
 
-}).call(this);
+export { CubemapToEquirectangular };

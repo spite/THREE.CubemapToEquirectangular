@@ -2,12 +2,20 @@
   "name": "three.cubemap-to-equirectangular",
   "version": "1.1.2",
   "description": "Export an equirectangular panorama image from a three.js scene",
-  "main": "build/CubemapToEquirectangular.js",
+  "type": "module",
+  "main": "src/CubemapToEquirectangular.js",
+  "exports": "./src/CubemapToEquirectangular.js",
+  "files": [
+    "src"
+  ],
   "directories": {
     "example": "examples"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "peerDependencies": {
+    "three": ">=0.155.0"
   },
   "repository": {
     "type": "git",
