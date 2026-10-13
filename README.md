@@ -119,4 +119,4 @@ three.js r155 or later, and WebGL 2. For three.js r116 and earlier use version 1
 
 MIT licensed
 
-Copyright (C) 2016 Jaume Sanchez Elias, http://www.clicktorelease.com
+Copyright (C) 2016 Jaume Sanchez Elias, https://www.clicktorelease.com
