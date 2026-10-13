@@ -2,6 +2,8 @@
 
 Helper to extract an equirectangular panorama PNG from any three.js scene.
 
+[![npm](https://img.shields.io/npm/v/three.cubemap-to-equirectangular.svg)](https://www.npmjs.com/package/three.cubemap-to-equirectangular)
+
 #### Demos ####
 - **[Managed mode](https://spite.github.io/THREE.CubemapToEquirectangular/examples/index-managed.html)**: press Capture to download a panorama of the scene
 - **[Unmanaged mode](https://spite.github.io/THREE.CubemapToEquirectangular/examples/index-unmanaged.html)**: the same, with a cube camera created by the page
